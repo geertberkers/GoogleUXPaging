@@ -2,7 +2,7 @@ package com.example.android.codelabs.paging.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.PagedList
+import androidx.paging.PagingData
 import com.example.android.codelabs.paging.api.GithubService
 import com.example.android.codelabs.paging.api.searchRepos
 import com.example.android.codelabs.paging.db.GithubLocalCache
@@ -15,7 +15,7 @@ class RepoBoundaryCallback(
         private val query: String,
         private val service: GithubService,
         private val cache: GithubLocalCache
-) : PagedList.BoundaryCallback<Repo>() {
+) : PagingData.BoundaryCallback<Repo>() {
 
     companion object {
         private const val NETWORK_PAGE_SIZE = 50

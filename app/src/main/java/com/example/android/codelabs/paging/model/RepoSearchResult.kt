@@ -17,13 +17,13 @@
 package com.example.android.codelabs.paging.model
 
 import androidx.lifecycle.LiveData
-import androidx.paging.PagedList
+import androidx.paging.PagingData
 
 /**
- * RepoSearchResult from a search, which contains LiveData<PagedList<Repo>> holding query data,
+ * RepoSearchResult from a search, which contains LiveData<PagingData<Repo>> holding query data,
  * and a LiveData<String> of network error state.
  */
 data class RepoSearchResult(
-        val data: LiveData<PagedList<Repo>>,
+        val data: LiveData<PagingData<Repo>>,
         val networkErrors: LiveData<String>
 )
