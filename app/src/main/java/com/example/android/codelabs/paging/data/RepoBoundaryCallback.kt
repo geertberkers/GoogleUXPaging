@@ -15,7 +15,7 @@ class RepoBoundaryCallback(
         private val query: String,
         private val service: GithubService,
         private val cache: GithubLocalCache
-) : PagingData.BoundaryCallback<Repo>() {
+)  { //}: PagingData.BoundaryCallback<Repo>() {
 
     companion object {
         private const val NETWORK_PAGE_SIZE = 50
@@ -34,13 +34,13 @@ class RepoBoundaryCallback(
     // avoid triggering multiple requests in the same time
     private var isRequestInProgress = false
 
-    override fun onZeroItemsLoaded() {
-        requestAndSaveData(query)
-    }
-
-    override fun onItemAtEndLoaded(itemAtEnd: Repo) {
-        requestAndSaveData(query)
-    }
+//    override fun onZeroItemsLoaded() {
+//        requestAndSaveData(query)
+//    }
+//
+//    override fun onItemAtEndLoaded(itemAtEnd: Repo) {
+//        requestAndSaveData(query)
+//    }
 
     private fun requestAndSaveData(query: String) {
         if (isRequestInProgress) return

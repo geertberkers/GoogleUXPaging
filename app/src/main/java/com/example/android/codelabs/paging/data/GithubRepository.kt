@@ -17,9 +17,11 @@
 package com.example.android.codelabs.paging.data
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.LivePagingData
 import androidx.paging.PagingConfig
 import com.example.android.codelabs.paging.api.GithubService
+import com.example.android.codelabs.paging.api.searchRepos
 import com.example.android.codelabs.paging.db.GithubLocalCache
 import com.example.android.codelabs.paging.model.RepoSearchResult
 import kotlinx.coroutines.Dispatchers
@@ -33,8 +35,18 @@ class GithubRepository(
 ) {
 
     companion object {
+        private const val NETWORK_PAGE_SIZE = 50
         private const val DATABASE_PAGE_SIZE = 20
     }
+
+    // keep the last requested page. When the request is successful, increment the page number.
+    private var lastRequestedPage = 1
+
+    // LiveData of network errors.
+    private val networkErrors = MutableLiveData<String>()
+
+    // avoid triggering multiple requests in the same time
+    private var isRequestInProgress = false
 
     /**
      * Search repositories whose names match the query.
@@ -45,17 +57,54 @@ class GithubRepository(
         // Get data source factory from the local cache
         val dataSourceFactory = cache.reposByName(query)
 
-        // Construct the boundary callback
-        val boundaryCallback = RepoBoundaryCallback(query, service, cache)
-        val networkErrors = boundaryCallback.networkErrors
-
         // Get the paged list
         val data = LivePagingData(
                 config = PagingConfig(pageSize = DATABASE_PAGE_SIZE),
+//                initialKey = 1,
                 pagingSourceFactory = dataSourceFactory.asPagingSourceFactory(Dispatchers.IO)
         )
 
         // Get the network errors exposed by the boundary callback
         return RepoSearchResult(data, networkErrors)
     }
+
+    fun requestMore(query: String) {
+        requestAndSaveData(query)
+    }
+    private fun requestAndSaveData(query: String) {
+        if (isRequestInProgress) return
+
+        isRequestInProgress = true
+        searchRepos(service, query, lastRequestedPage, NETWORK_PAGE_SIZE,
+                onSuccess = { repos ->
+                    cache.insert(repos) {
+                        lastRequestedPage++
+                        isRequestInProgress = false
+                    }
+                },
+                onError = { error ->
+                    networkErrors.postValue(error)
+                    isRequestInProgress = false
+                }
+        )
+    }
+//    fun search(query: String): RepoSearchResult {
+//        Log.d("GithubRepository", "New query: $query")
+//
+//        // Get data source factory from the local cache
+//        val dataSourceFactory = cache.reposByName(query)
+//
+//        // Construct the boundary callback
+//        val boundaryCallback = RepoBoundaryCallback(query, service, cache)
+//        val networkErrors = boundaryCallback.networkErrors
+//
+//        // Get the paged list
+//        val data = LivePagingData(
+//                config = PagingConfig(pageSize = DATABASE_PAGE_SIZE),
+//                pagingSourceFactory = dataSourceFactory.asPagingSourceFactory(Dispatchers.IO)
+//        )
+//
+//        // Get the network errors exposed by the boundary callback
+//        return RepoSearchResult(data, networkErrors)
+//    }
 }
