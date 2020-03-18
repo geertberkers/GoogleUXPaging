@@ -17,7 +17,6 @@
 package com.example.android.codelabs.paging.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -60,12 +59,18 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         outState.putString(LAST_SEARCH_QUERY, viewModel.lastQueryValue())
     }
 
+    @Suppress("RemoveExplicitTypeArguments")
     private fun initAdapter() {
         list.adapter = adapter
         viewModel.repos.observe(this, Observer<PagingData<Repo>> {
-            Log.d("Activity", "list: ${it?.size}")
-            showEmptyList(it?.size == 0)
-            adapter.submitList(it)
+
+//            Log.d("Activity", "list: ${it?.size}")
+//            showEmptyList(it?.size == 0)
+//            adapter.submitList(it)
+            adapter.submitData(lifecycle, it)
+
+            // NOTE: Coroutine function
+            // adapter.presentData(it)
         })
         viewModel.networkErrors.observe(this, Observer<String> {
             Toast.makeText(this, "\uD83D\uDE28 Wooops $it", Toast.LENGTH_LONG).show()
@@ -98,7 +103,15 @@ class SearchRepositoriesActivity : AppCompatActivity() {
             if (it.isNotEmpty()) {
                 list.scrollToPosition(0)
                 viewModel.searchRepo(it.toString())
-                adapter.submitList(null)
+
+                // NOTE: Old method
+                // adapter.submitList(null)
+
+                // NOTE: Coroutine function
+                // adapter.presentData(null)
+
+                // NOTE: Set new list
+                adapter.submitData(lifecycle, PagingData.empty())
             }
         }
     }
