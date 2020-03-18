@@ -17,10 +17,12 @@
 package com.example.android.codelabs.paging.data
 
 import android.util.Log
-import androidx.paging.LivePagedListBuilder
+import androidx.paging.LivePagingData
+import androidx.paging.PagingConfig
 import com.example.android.codelabs.paging.api.GithubService
 import com.example.android.codelabs.paging.db.GithubLocalCache
 import com.example.android.codelabs.paging.model.RepoSearchResult
+import kotlinx.coroutines.Dispatchers
 
 /**
  * Repository class that works with local and remote data sources.
@@ -48,9 +50,10 @@ class GithubRepository(
         val networkErrors = boundaryCallback.networkErrors
 
         // Get the paged list
-        val data = LivePagedListBuilder(dataSourceFactory, DATABASE_PAGE_SIZE)
-                .setBoundaryCallback(boundaryCallback)
-                .build()
+        val data = LivePagingData(
+                config = PagingConfig(pageSize = DATABASE_PAGE_SIZE),
+                pagingSourceFactory = dataSourceFactory.asPagingSourceFactory(Dispatchers.IO)
+        )
 
         // Get the network errors exposed by the boundary callback
         return RepoSearchResult(data, networkErrors)
