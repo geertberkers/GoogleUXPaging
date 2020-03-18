@@ -19,8 +19,8 @@ class RepoBoundaryCallback(
 
     companion object {
         private const val NETWORK_PAGE_SIZE = 50
-        private const val DATABASE_PAGE_SIZE = 20
     }
+
     // keep the last requested page.
     // When the request is successful, increment the page number.
     private var lastRequestedPage = 1

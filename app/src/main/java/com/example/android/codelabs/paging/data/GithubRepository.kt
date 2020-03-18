@@ -17,10 +17,8 @@
 package com.example.android.codelabs.paging.data
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.paging.LivePagedListBuilder
 import com.example.android.codelabs.paging.api.GithubService
-import com.example.android.codelabs.paging.api.searchRepos
 import com.example.android.codelabs.paging.db.GithubLocalCache
 import com.example.android.codelabs.paging.model.RepoSearchResult
 
@@ -32,33 +30,13 @@ class GithubRepository(
     private val cache: GithubLocalCache
 ) {
 
-
+    companion object {
+        private const val DATABASE_PAGE_SIZE = 20
+    }
 
     /**
      * Search repositories whose names match the query.
      */
-//    fun search(query: String): RepoSearchResult {
-//        Log.d("GithubRepository", "New query: $query")
-//        lastRequestedPage = 1
-//        requestAndSaveData(query)
-//
-//        // Get data from the local cache
-//        val data = cache.reposByName(query)
-//
-//        return RepoSearchResult(data, networkErrors)
-//    }
-
-//    fun search(query: String): RepoSearchResult {
-//        // Get data source factory from the local cache
-//        val dataSourceFactory = cache.reposByName(query)
-//
-//        // Get the paged list
-//        val data = LivePagedListBuilder(dataSourceFactory, DATABASE_PAGE_SIZE).build()
-//
-//        // Get the network errors exposed by the boundary callback
-//        return RepoSearchResult(data, networkErrors)
-//    }
-
     fun search(query: String): RepoSearchResult {
         Log.d("GithubRepository", "New query: $query")
 
@@ -76,15 +54,5 @@ class GithubRepository(
 
         // Get the network errors exposed by the boundary callback
         return RepoSearchResult(data, networkErrors)
-    }
-
-//    fun requestMore(query: String) {
-//        requestAndSaveData(query)
-//    }
-
-
-
-    companion object {
-        private const val DATABASE_PAGE_SIZE = 20
     }
 }
