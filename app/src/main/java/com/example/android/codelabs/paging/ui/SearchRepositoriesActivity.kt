@@ -18,12 +18,12 @@ package com.example.android.codelabs.paging.ui
 
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.android.codelabs.paging.Injection
@@ -35,13 +35,16 @@ class SearchRepositoriesActivity : AppCompatActivity() {
 
     private lateinit var viewModel: SearchRepositoriesViewModel
     private val adapter = ReposAdapter()
+    private val loadStateAdapter = MyLoadStateAdapter(retry = {
+        Toast.makeText(this, "Error! Implement me", Toast.LENGTH_SHORT).show()
+    })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_repositories)
 
         // get the view model
-        viewModel = ViewModelProviders.of(this, Injection.provideViewModelFactory(this))
+        viewModel = ViewModelProvider(this, Injection.provideViewModelFactory(this))
                 .get(SearchRepositoriesViewModel::class.java)
 
         // add dividers between RecyclerView's row items
@@ -62,9 +65,14 @@ class SearchRepositoriesActivity : AppCompatActivity() {
 
     @Suppress("RemoveExplicitTypeArguments")
     private fun initAdapter() {
-        list.adapter = adapter
-        viewModel.repos.observe(this, Observer<PagingData<Repo>> {
+        adapter.addLoadStateListener { loadType, loadState ->
+            println("LoadType: $loadType")
+            println("LoadState: $loadState")
+        }
 
+        list.adapter = adapter.withLoadStateHeaderAndFooter(loadStateAdapter, loadStateAdapter)
+
+        viewModel.repos.observe(this, Observer<PagingData<Repo>> {
 //            Log.d("Activity", "list: ${it?.size}")
 //            showEmptyList(it?.size == 0)
 //            adapter.submitList(it)
@@ -131,15 +139,15 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         })
     }
 
-    private fun showEmptyList(show: Boolean) {
-        if (show) {
-            emptyList.visibility = View.VISIBLE
-            list.visibility = View.GONE
-        } else {
-            emptyList.visibility = View.GONE
-            list.visibility = View.VISIBLE
-        }
-    }
+//    private fun showEmptyList(show: Boolean) {
+//        if (show) {
+//            emptyList.visibility = View.VISIBLE
+//            list.visibility = View.GONE
+//        } else {
+//            emptyList.visibility = View.GONE
+//            list.visibility = View.VISIBLE
+//        }
+//    }
 
     companion object {
         private const val LAST_SEARCH_QUERY: String = "last_search_query"
