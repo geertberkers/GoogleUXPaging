@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">GitHubAPI</string>
+    <string name="retry">Retry</string>
+    <string name="search_hint">GitHub Username</string>
+    <string name="default_user">google</string>
+</resources>
