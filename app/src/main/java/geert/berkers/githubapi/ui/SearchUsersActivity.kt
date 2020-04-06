@@ -65,24 +65,26 @@ class SearchUsersActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            model.items.collectLatest {
 
-                // NOTE: The API DOES NOT allow filtering on username!
-                //       But I still want to try to implement this function based on login or score.
-                //       But it seems that the breakpoint does not occur.
-                it.insertSeparators { item, item2 ->
-                    if (item2 != null) {
+            model.items.collectLatest { pagingData ->
 
-                        if (item != null) {
+//                // NOTE: The API DOES NOT allow filtering on username!
+//                //       But I still want to try to implement this function based on login or score.
+//                //       But it seems that the breakpoint does not occur.
+//                val newData = pagingData.insertSeparators { item, item2 ->
+//                    if (item2 != null) {
+//
+//                        if (item != null) {
+//
+//                            if (item2.login!!.first() != item.login!!.first() ) {
+//                                return@insertSeparators item2.copy(login = item2.login!!.first().toString())
+//                            }
+//                        }
+//                    }
+//                    null
+//                }
 
-                            if (item2.login!!.first() != item.login!!.first() ) {
-                                return@insertSeparators item2.copy(login = item2.login!!.first().toString())
-                            }
-                        }
-                    }
-                    null
-                }
-                adapter.presentData(it)
+                adapter.presentData(pagingData)
             }
         }
 
